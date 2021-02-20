@@ -34,6 +34,7 @@ beforeEach(async function() {
     );
     tokens[user[0]] = createToken(user[0], user[6]);
   }
+
 });
 
 describe("POST /auth/register", function() {
@@ -161,6 +162,59 @@ describe("PATCH /users/[username]", function() {
     });
   });
 
+  test("should update and return all user data when admin", async function() {
+    const response = await request(app)
+      .patch("/users/u1")
+      .send({ _token: tokens.u3, first_name: "new-fn1", last_name: "newLast", phone: "9999999999" , email: "newEmail1" }); 
+    expect(response.statusCode).toBe(200);
+    expect(response.body.user).toEqual({
+      username: "u1",
+      first_name: "new-fn1",
+      last_name: "newLast",
+      email: "newEmail1",
+      phone: "9999999999",
+      admin: false,
+      password: expect.any(String)
+    });
+  });
+
+//**************************************************************** TEST BUG #2
+ 
+  test("works even when extra fields passed in that are still other valid sql", async function() {
+    const response = await request(app)
+      .patch("/users/u1")
+      .send({ _token: tokens.u3, 
+        first_name: "new-fn1", 
+      last_name: "newLast", 
+      phone: "9999999999" , 
+      email: "newEmail1", 
+      password: "valid SQL that should not have been passed in"}); 
+    expect(response.statusCode).toBe(200);
+    expect(response.body.user.password).not.toBe("valid SQL that should not have been passed in");
+  });
+
+  test("works even when extra fields passed in", async function() {
+    const response = await request(app)
+      .patch("/users/u1")
+      .send({ _token: tokens.u3, 
+        first_name: "new-fn1", 
+      last_name: "newLast", 
+      phone: "9999999999" , 
+      email: "newEmail1", 
+      extraData: "this data should not have been passed in"}); 
+    expect(response.statusCode).toBe(200);
+    expect(response.body.user).toEqual({
+      username: "u1",
+      first_name: "new-fn1",
+      last_name: "newLast",
+      email: "newEmail1",
+      phone: "9999999999",
+      admin: false,
+      password: expect.any(String)
+    });
+  });
+
+
   test("should disallowing patching not-allowed-fields", async function() {
     const response = await request(app)
       .patch("/users/u1")
@@ -174,7 +228,9 @@ describe("PATCH /users/[username]", function() {
       .send({ _token: tokens.u3, first_name: "new-fn" }); // u3 is admin
     expect(response.statusCode).toBe(404);
   });
+
 });
+
 
 describe("DELETE /users/[username]", function() {
   test("should deny access if no token provided", async function() {

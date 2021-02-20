@@ -18,14 +18,18 @@ function sqlForPartialUpdate(table, items, key, id) {
   let idx = 1;
   let columns = [];
 
-  // filter out keys that start with "_" -- we don't want these in DB
-  for (let key in items) {
-    if (key.startsWith("_")) {
-      delete items[key]
-    }
-  }
 
-  for (let column in items) {
+  //**************************************************************** FIXES BUG #2
+
+  const allowed = ["first_name", "last_name", "phone", "email"]
+
+  const updatedItems = {};
+  Object.entries(items).forEach( function ([key, value]) {
+    if (allowed.includes(key)) {
+      updatedItems[key] = value;
+  }});
+
+  for (let column in updatedItems) {
     columns.push(`${column}=$${idx}`);
     idx += 1;
   }
@@ -34,7 +38,7 @@ function sqlForPartialUpdate(table, items, key, id) {
   let cols = columns.join(", ");
   let query = `UPDATE ${table} SET ${cols} WHERE ${key}=$${idx} RETURNING *`;
 
-  let values = Object.values(items);
+  let values = Object.values(updatedItems); 
   values.push(id);
 
   return {query, values};

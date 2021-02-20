@@ -8,7 +8,7 @@ const createTokenForUser = require('../helpers/createToken');
 
 /** Register user; return token.
  *
- *  Accepts {username, first_name, last_name, email, phone, password}.
+ *  Accepts {username,password, first_name, last_name, email, phone}.
  *
  *  Returns {token: jwt-token-string}.
  *
