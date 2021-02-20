@@ -104,6 +104,10 @@ describe("GET /users", function() {
       .send({ _token: tokens.u1 });
     expect(response.statusCode).toBe(200);
     expect(response.body.users.length).toBe(3);
+      //**************************************************************** */  TESTS BUG #1
+    expect(response.body.users[0].username).toContain("u1");
+    expect(response.body.users[0].first_name).toContain("fn1");
+    expect(response.body.users[0].password).not.toBeDefined();
   });
 });
 
