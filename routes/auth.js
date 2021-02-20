@@ -23,6 +23,7 @@ router.post('/register', async function(req, res, next) {
     const token = createTokenForUser(username, user.admin);
     return res.status(201).json({ token });
   } catch (err) {
+    console.log(`*ERRRRRRRRRRRRRRRRR${err}`)
     return next(err);
   }
 }); // end

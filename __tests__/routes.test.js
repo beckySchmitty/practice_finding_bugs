@@ -97,14 +97,15 @@ describe("POST /auth/login", function() {
     const response = await request(app)
       .post("/auth/login")
       .send({
-        username: "u1",
+        username: "u2",
         password: "incorrect"
       });
+      // is giving me a 200 error
     expect(response.statusCode).toBe(401);
     expect(response.body).toEqual({ token: expect.any(String) });
 
     let { username, admin } = jwt.verify(response.body.token, SECRET_KEY);
-    expect(username).toBe("u1");
+    expect(username).toBe("u2");
     expect(admin).toBe(false);
   });
 
