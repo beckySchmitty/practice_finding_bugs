@@ -13,3 +13,7 @@ In the POST auth/login route, it was missing an "await" before calling User.auth
 ## Bug 4
 
 User.register was not checking to make sure all required values ("username", "password", "first_name", "last_name", "email", "phone") were passed in from the route. I added error handling to throw an error if any of the required values are missing and wrote tests to ensure the error handling worked. 
+
+## Bug 5
+
+Delete route for user did not have keyword "await" so it was not waiting long enough for the query to check if the user did exist in the database. 
