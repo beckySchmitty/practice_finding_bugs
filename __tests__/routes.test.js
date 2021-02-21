@@ -123,22 +123,17 @@ describe("POST /auth/login", function() {
     expect(admin).toBe(false);
   });
 
-  // **************************************************************************************** TESTS Bug 3
-  // test("should not allow an incorrect username/password to log in", async function() {
-  //   const response = await request(app)
-  //     .post("/auth/login")
-  //     .send({
-  //       username: "u2",
-  //       password: "incorrect"
-  //     });s
-  //     // is giving me a 200 error
-  //   expect(response.statusCode).toBe(401);
-  //   expect(response.body).toEqual({ token: expect.any(String) });
-
-  //   let { username, admin } = jwt.verify(response.body.token, SECRET_KEY);
-  //   expect(username).toBe("u2");
-  //   expect(admin).toBe(false);
-  // });
+  // **************************************************************************************** TESTS BUG 3
+  test("should not allow an incorrect username/password to log in", async function() {
+    const response = await request(app)
+      .post("/auth/login")
+      .send({
+        username: "u2",
+        password: "incorrect"
+      });
+    expect(response.body.message).toEqual("Cannot authenticate user");
+    expect(response.body.statusCode).toEqual(401);
+  });
 
 
 });

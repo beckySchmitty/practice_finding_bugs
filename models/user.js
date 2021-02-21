@@ -81,12 +81,16 @@ class User {
 
     const user = result.rows[0];
 
-    if (user && (await bcrypt.compare(password, user.password))) {
+    // Additional fix for BUG 3
+    const passwordCheck = await bcrypt.compare(password, user.password);
 
-      return user;
-    } else {
-      throw new ExpressError('Cannot authenticate', 401);
+    if (passwordCheck != true) {
+      throw new ExpressError('Cannot authenticate user', 401);
     }
+
+    if (user && passwordCheck) {
+      return user;
+    }  
   }
 
   /** Returns list of user info:

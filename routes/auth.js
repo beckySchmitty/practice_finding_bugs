@@ -23,7 +23,6 @@ router.post('/register', async function(req, res, next) {
     const token = createTokenForUser(username, user.admin);
     return res.status(201).json({ token });
   } catch (err) {
-    console.log(`*ERRRRRRRRRRRRRRRRR${err}`)
     return next(err);
   }
 }); // end
@@ -41,7 +40,8 @@ router.post('/register', async function(req, res, next) {
 router.post('/login', async function(req, res, next) {
   try {
     const { username, password } = req.body;
-    let user = User.authenticate(username, password);
+    // *********************************************************** FIXES BUG 3
+    let user = await User.authenticate(username, password);
     const token = createTokenForUser(username, user.admin);
     return res.json({ token });
   } catch (err) {
