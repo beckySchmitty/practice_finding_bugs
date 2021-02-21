@@ -297,6 +297,15 @@ describe("DELETE /users/[username]", function() {
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual({ message: "deleted" });
   });
+
+  test("should throw 404 if no user w/ that username", async function() {
+    const response = await request(app)
+      .delete("/users/u99")
+      .send({ _token: tokens.u3 }); 
+    expect(response.statusCode).toBe(404);
+    expect(response.body).toEqual({ message: 'No such user' });
+  });
+
 });
 
 afterEach(async function() {

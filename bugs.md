@@ -8,7 +8,7 @@ The user patch route was not filtering out unwanted data that could have been se
 
 ## Bug 3
 
-Something with the User auth routes. Getting an error 'Error: There already exists a user with username 'u1'' 
+In the POST auth/login route, it was missing an "await" before calling User.authenticate(). The code wasn't waiting to check the password and automcatically moved to the next line creating and returning a token. I added await when called in the route itself and then rewrote the way the password was checked on the user model for more clarity. 
 
 ## Bug 4
 
