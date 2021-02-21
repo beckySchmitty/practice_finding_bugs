@@ -4,40 +4,55 @@ const ExpressError = require('../helpers/expressError');
 const sqlForPartialUpdate = require('../helpers/partialUpdate');
 const { BCRYPT_WORK_FACTOR } = require("../config");
 
+const requiredForRegister = ["username", "password", "first_name", "last_name", "email", "phone"]
+
+
 class User {
 
-/** Register user with data. Returns new user data. */
+/** Register user with data. Returns new user data.
+ * data passed in must contain {username, password, first_name, last_name, email, phone}
+ */
+  static async register(data) {
 
-  static async register({username, password, first_name, last_name, email, phone}) {
+    //**************************************************************** */  FIXES BUG #4
+    const VALUES = [
+      data.username,
+      data.password,
+      data.first_name,
+      data.last_name,
+      data.email,
+      data.phone
+    ]
+
+    // Error thrown if required value for user was not passed in via data
+    for (let i=0; i < VALUES.length; i++) {
+      if (!VALUES[i]) {
+        throw new ExpressError(`${requiredForRegister[i]} required to register user`, 400)
+      }
+    }
+
     const duplicateCheck = await db.query(
       `SELECT username 
         FROM users 
         WHERE username = $1`,
-      [username]
+      [data.username]
     );
 
     if (duplicateCheck.rows[0]) {
       throw new ExpressError(
-        `There already exists a user with username '${username}'`,
+        `There already exists a user with username '${data.username}'`,
         400
       );
     }
 
-    const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
+    const hashedPassword = await bcrypt.hash(data.password, BCRYPT_WORK_FACTOR);
+    VALUES[1] = hashedPassword
 
     const result = await db.query(
       `INSERT INTO users 
           (username, password, first_name, last_name, email, phone) 
         VALUES ($1, $2, $3, $4, $5, $6) 
-        RETURNING username, password, first_name, last_name, email, phone`,
-      [
-        username,
-        hashedPassword,
-        first_name,
-        last_name,
-        email,
-        phone
-      ]
+        RETURNING username, password, first_name, last_name, email, phone`, VALUES
     );
 
     return result.rows[0];

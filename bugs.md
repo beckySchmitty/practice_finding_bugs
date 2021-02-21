@@ -9,3 +9,7 @@ The user patch route was not filtering out unwanted data that could have been se
 ## Bug 3
 
 Something with the User auth routes. Getting an error 'Error: There already exists a user with username 'u1'' 
+
+## Bug 4
+
+User.register was not checking to make sure all required values ("username", "password", "first_name", "last_name", "email", "phone") were passed in from the route. I added error handling to throw an error if any of the required values are missing and wrote tests to ensure the error handling worked. 
